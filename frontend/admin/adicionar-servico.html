@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Adicionar Serviço</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+</head>
+<body>
+
+<h1>Adicionar Serviço</h1>
+
+<form id="adicionarServicoForm">
+    <input type="hidden" name="idEmpresa" value="1">
+
+    <label for="nome">Nome:</label>
+    <input type="text" name="nomeServico" required>
+
+    <label for="descricao">Descrição:</label>
+    <input type="text" name="descricaoServico" required>
+
+    <label for="valor">Valor:</label>
+    <input type="text" name="valor" required>
+
+    <label for="imgServico">Imagem:</label>
+    <input type="text" name="imgServico">
+
+    <input type="submit" value="Adicionar Serviço">
+</form>
+
+<div id="mensagemServidor"></div>
+
+<script>
+    $(document).ready(function() {
+        $("#adicionarServicoForm").submit(function(e) {
+            e.preventDefault(); 
+
+            $.ajax({
+                type: "POST",
+                url: "../../backend/admin/adicionar-servico.php", 
+                data: $(this).serialize() + "&ajax=true", 
+                success: function(response) {
+                    $("#mensagemServidor").html(response);
+                },
+                error: function(error) {
+                    console.log(error);
+                    $("#mensagemServidor").html("Erro ao processar a solicitação.");
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

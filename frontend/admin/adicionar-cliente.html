@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Adicionar Cliente</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+</head>
+<body>
+
+<h1>Adicionar Cliente</h1>
+
+<form id="adicionarClienteForm">
+    <input type="hidden" name="idEmpresa" value="1">
+
+    <label for="nome">Nome:</label>
+    <input type="text" name="nomeCliente" required>
+
+    <label for="telefone">Telefone:</label>
+    <input type="text" name="telefone" required>
+
+    <label for="email">E-mail:</label>
+    <input type="text" name="email" required>
+
+    <label for="senha">Senha:</label>
+    <input type="password" name="senha" required>
+
+    <label for="confirmarSenha">Confirmar Senha:</label>
+    <input type="password" name="confirmarSenha" required>
+
+    <input type="submit" value="Adicionar Cliente">
+</form>
+
+<div id="mensagemServidor"></div>
+
+<script>
+    $(document).ready(function() {
+        $("#adicionarClienteForm").submit(function(e) {
+            e.preventDefault(); 
+
+            $.ajax({
+                type: "POST",
+                url: "../../backend/admin/adicionar-cliente.php", 
+                data: $(this).serialize() + "&ajax=true", 
+                success: function(response) {
+                    $("#mensagemServidor").html(response);
+                },
+                error: function(error) {
+                    console.log(error);
+                    $("#mensagemServidor").html("Erro ao processar a solicitação.");
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

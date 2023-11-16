@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Adicionar Cargo</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+</head>
+<body>
+
+<h1>Adicionar Cargo</h1>
+
+<form id="adicionarCargoForm">
+    <input type="hidden" name="idEmpresa" value="1">
+
+    <label for="nome">Nome:</label>
+    <input type="text" name="nomeCargo" required>
+
+    <label for="descricao">Descrição:</label>
+    <input type="text" name="descricaoCargo">
+
+    <input type="submit" value="Adicionar Cargo">
+</form>
+
+<div id="mensagemServidor"></div>
+
+<script>
+    $(document).ready(function() {
+        $("#adicionarCargoForm").submit(function(e) {
+            e.preventDefault(); 
+
+            $.ajax({
+                type: "POST",
+                url: "../../backend/admin/adicionar-cargo.php", 
+                data: $(this).serialize() + "&ajax=true", 
+                success: function(response) {
+                    $("#mensagemServidor").html(response);
+                },
+                error: function(error) {
+                    console.log(error);
+                    $("#mensagemServidor").html("Erro ao processar a solicitação.");
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>
