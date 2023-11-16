@@ -129,5 +129,33 @@ function obterCargos(){
     return $cargos;
 }
 
+function obterReservas ($idCliente, $idFuncionario){
+    global $conn;
+
+    $sql = "SELECT reserva.idReserva,
+                   reserva.idEmpresa,
+                   reserva.idCliente,
+                   reserva.dataReserva,
+                   reserva.horaReserva,
+                   status.nomeStatusReserva as status,
+                   reserva.prioridade
+            FROM tb_reserva reserva
+            INNER JOIN tb_status_reserva status
+            WHERE reserva.idCliente = IFNULL(".$idCliente.", reserva.idCliente)
+            AND   reserva.idFuncionario = IFNULL(".$idFuncionario.", reserva.idFuncionario)";
+    
+    $result = $conn->query($sql);
+
+    $cargos = array();
+
+    if ($result -> num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $cargos[] = $row;
+        }
+    }
+
+    return $cargos;
+}
+
 ?>
 
