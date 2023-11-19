@@ -34,7 +34,7 @@ function obterClientes() {
     return $clientes;
 }
 
-function obterFuncionarios() {
+function obterFuncionarios($email) {
     global $conn; 
 
     $sql = "SELECT funcionario.idFuncionario,
@@ -45,7 +45,8 @@ function obterFuncionarios() {
                    funcionario.senha
             FROM tb_funcionario as funcionario
             INNER JOIN tb_cargo as cargo
-            ON funcionario.cargo = cargo.idCargo";
+            ON funcionario.cargo = cargo.idCargo
+            WHERE funcionario.email = IFNULL('$email', funcionario.email)";
             
     $result = $conn->query($sql);
 
@@ -135,12 +136,20 @@ function obterReservas ($idCliente, $idFuncionario){
     $sql = "SELECT reserva.idReserva,
                    reserva.idEmpresa,
                    reserva.idCliente,
+                   cliente.nomeCliente,
                    reserva.dataReserva,
                    reserva.horaReserva,
-                   status.nomeStatusReserva as status,
-                   reserva.prioridade
+                   reserva.status,
+                   status.nomeStatusReserva,
+                   reserva.prioridade,
+                   funcionario.nomeFuncionario
             FROM tb_reserva reserva
             INNER JOIN tb_status_reserva status
+            ON reserva.status = status.idStatusReserva
+            INNER JOIN tb_cliente cliente
+            ON reserva.idCliente = cliente.idCliente
+            INNER JOIN tb_funcionario funcionario
+            ON reserva.idFuncionario = funcionario.idFuncionario
             WHERE reserva.idCliente = IFNULL(".$idCliente.", reserva.idCliente)
             AND   reserva.idFuncionario = IFNULL(".$idFuncionario.", reserva.idFuncionario)";
     
@@ -155,6 +164,90 @@ function obterReservas ($idCliente, $idFuncionario){
     }
 
     return $cargos;
+}
+
+function obterAtendimentos ($idCliente, $idFuncionario){
+    global $conn;
+
+    $sql = "SELECT idAtendimento,
+                   idEmpresa,
+                   idCliente,
+                   idFuncionario,
+                   dataAtendimento,
+                   servico,
+                   valor
+            FROM tb_atendimento atendimento
+            WHERE atendimento.idCliente = IFNULL(".$idCliente.", atendimento.idCliente)
+            AND   atendimento.idFuncionario = IFNULL(".$idFuncionario.", atendimento.idFuncionario)";
+    
+    $result = $conn->query($sql);
+
+    $cargos = array();
+
+    if ($result -> num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $cargos[] = $row;
+        }
+    }
+
+    return $cargos;
+}
+
+function validarLoginCliente($email, $senha) {
+    global $conn;
+
+    $sql = "SELECT COUNT(1) AS QTD_REGISTRO
+            FROM tb_cliente cliente
+            WHERE cliente.email = $email
+            and   cliente.senha = $senha";
+    
+    $result = $conn->query($sql);
+
+    if ($result -> num_rows > 0){
+        return true;
+    }else{
+        return false;
+    }
+
+}
+
+function validarLoginFuncionario($email, $senha) {
+    global $conn;
+
+    $sql = "SELECT 1
+            FROM tb_funcionario funcionario
+            WHERE funcionario.email = '$email'
+            and   funcionario.senha = '$senha'";
+    
+    $result = $conn->query($sql);
+
+    if ($result -> num_rows > 0){
+        return true;
+    }else{
+        return false;
+    }
+
+}
+
+function obterDadosAnaliticos() {
+    global $conn;
+
+    $sql = "SELECT  (SELECT IFNULL(SUM(VALOR), 0) FROM TB_ATENDIMENTO) AS QTD_VALOR,
+                    (SELECT IFNULL(COUNT(1), 0)   FROM TB_ATENDIMENTO) AS QTD_CORTE,
+                    (SELECT IFNULL(COUNT(1), 0)   FROM TB_RESERVA)     AS QTD_RESERVAS
+            FROM DUAL";
+    
+    $result = $conn->query($sql);
+    $dados = array();
+
+    if ($result -> num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $dados[] = $row;
+        }
+    }
+
+    return $dados;
+
 }
 
 ?>

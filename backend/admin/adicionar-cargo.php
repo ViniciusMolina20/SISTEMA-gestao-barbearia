@@ -15,7 +15,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['ajax'])) {
 
 function adicionarCargo($idEmpresa, $nomeCargo, $descricaoCargo) {
     global $conn;
-
+    
     $sql = "INSERT INTO tb_cargo (idEmpresa, nomeCargo, descricaoCargo) VALUES ('$idEmpresa', '$nomeCargo', '$descricaoCargo')";
 
     if ($conn->query($sql) === TRUE) {

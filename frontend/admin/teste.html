@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exemplo</title>
+</head>
+<body>
+
+    <table id="tabela">
+        <!-- A tabela será preenchida dinamicamente com JavaScript -->
+    </table>
+
+    <script>
+        // Suponha que 'dadosDaAPI' seja um array de objetos com os dados da API
+        var dadosDaAPI = [
+            {
+                nome: "Brandon Washington",
+                nomeEmpresa: "Company name 1",
+                progresso: 79,
+                status: "In progress"
+            },
+            // Adicione mais objetos conforme necessário
+        ];
+
+        // Função para criar a tabela dinamicamente
+        function criarTabela() {
+            var tabela = document.getElementById("tabela");
+
+            // Loop pelos dados da API
+            dadosDaAPI.forEach(function (dados) {
+                var novaLinha = tabela.insertRow();
+
+                // Coluna 1: Nome
+                var colunaNome = novaLinha.insertCell(0);
+                colunaNome.innerHTML = '<div class="d-flex "><div><h6>' + dados.nome + '</h6></div></div>';
+
+                // Coluna 2: Nome da Empresa
+                var colunaEmpresa = novaLinha.insertCell(1);
+                colunaEmpresa.innerHTML = '<h6>' + dados.nomeEmpresa + '</h6>';
+
+                // Coluna 3: Progresso
+                var colunaProgresso = novaLinha.insertCell(2);
+                colunaProgresso.innerHTML = '<div><div class="d-flex justify-content-between align-items-center mb-1 max-width-progress-wrap"><p class="text-success">' + dados.progresso + '%</p><p>' + dados.progresso + '/162</p></div><div class="progress progress-md"><div class="progress-bar bg-success" role="progressbar" style="width: ' + dados.progresso + '%" aria-valuenow="' + dados.progresso + '" aria-valuemin="0" aria-valuemax="100"></div></div></div>';
+
+                // Coluna 4: Status
+                var colunaStatus = novaLinha.insertCell(3);
+                colunaStatus.innerHTML = '<div class="badge badge-opacity-warning">' + dados.status + '</div>';
+            });
+        }
+
+        // Chamar a função para criar a tabela
+        criarTabela();
+    </script>
+
+</body>
+</html>
