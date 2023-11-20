@@ -37,17 +37,32 @@ function obterClientes() {
 function obterFuncionarios($email) {
     global $conn; 
 
-    $sql = "SELECT funcionario.idFuncionario,
+    if (is_null($email)){
+        $sql = "SELECT funcionario.idFuncionario,
                    funcionario.idEmpresa,
                    funcionario.nomeFuncionario,
                    cargo.nomeCargo,
                    funcionario.email,
-                   funcionario.senha
+                   funcionario.senha,
+                   funcionario.img_perfil
             FROM tb_funcionario as funcionario
             INNER JOIN tb_cargo as cargo
-            ON funcionario.cargo = cargo.idCargo
-            WHERE funcionario.email = IFNULL('$email', funcionario.email)";
-            
+            ON funcionario.cargo = cargo.idCargo";
+    }else {
+        $sql = "SELECT funcionario.idFuncionario,
+                    funcionario.idEmpresa,
+                    funcionario.nomeFuncionario,
+                    cargo.nomeCargo,
+                    funcionario.email,
+                    funcionario.senha,
+                    funcionario.img_perfil
+                FROM tb_funcionario as funcionario
+                INNER JOIN tb_cargo as cargo
+                ON funcionario.cargo = cargo.idCargo
+                WHERE funcionario.email = '$email'";
+
+    }
+
     $result = $conn->query($sql);
 
     $funcionarios = array();
@@ -248,6 +263,61 @@ function obterDadosAnaliticos() {
 
     return $dados;
 
+}
+
+function obterDadosAnaliticosReceitaMensal() {
+    global $conn;
+
+    $sql = "SELECT MONTH(atendimento.dataAtendimento) as mes,
+                   YEAR(atendimento.dataAtendimento) as ano,
+                   funcionario.nomeFuncionario,
+                   sum(atendimento.valor) as valor,
+                   COUNT(1) as qtd_atendimento
+            FROM tb_atendimento atendimento
+            INNER JOIN tb_funcionario funcionario
+            on atendimento.idFuncionario = funcionario.idFuncionario
+            GROUP BY MONTH(atendimento.dataAtendimento), 
+                     YEAR(atendimento.dataAtendimento), 
+                     funcionario.nomeFuncionario";
+    
+    $result = $conn->query($sql);
+    $dados = array();
+
+    if ($result -> num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $dados[] = $row;
+        }
+    }
+
+    return $dados;
+}
+
+function obterDadosFinanceiros() {
+    global $conn;
+
+    $sql = "SELECT  idFinanceiro,
+                    idEmpresa,
+                    dataTransacao,
+                    descricao,
+                    tipoTransacao,
+                    transacao.nomeTransacao,
+                    valor,
+                    MONTH(dataTransacao) as mes,
+                    YEAR(dataTransacao) as ano
+            FROM tb_financeiro financeiro
+            INNER JOIN tb_tipo_transacao transacao
+            ON financeiro.tipoTransacao = transacao.idTipoTransacao";
+    
+    $result = $conn->query($sql);
+    $dados = array();
+
+    if ($result -> num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $dados[] = $row;
+        }
+    }
+
+    return $dados;
 }
 
 ?>

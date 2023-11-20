@@ -15,9 +15,13 @@ if ($validacao){
 
     foreach ($funcionarios as $funcionario) {
         $nomeFuncionario = $funcionario['nomeFuncionario'];
+        $emailFuncionario = $funcionario['email'];
+        $imagemPerfil = $funcionario['img_perfil'];
     }
 
     $_SESSION['nomeUsuario'] = $nomeFuncionario;
+    $_SESSION['emailFuncionario'] = $emailFuncionario;
+    $_SESSION['imagemPerfil'] =  $imagemPerfil;
 
     echo "<script>window.location.href = '../../frontend/admin/index.html';</script>";
 }else{
