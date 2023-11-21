@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
@@ -41,7 +40,7 @@
         <ul class="navbar-nav">
           <li class="nav-item font-weight-semibold d-none d-lg-block ms-0">
             <h1 class="welcome-text">Bem vindo, <span class="text-black fw-bold" id="nomeUsuario"></span></h1>
-            <h3 class="welcome-sub-text">Cadastro de Funcionário</h3>
+            <h3 class="welcome-sub-text">Controle o acesso dos funcionários</h3>
           </li>
         </ul>
         <ul class="navbar-nav ms-auto">
@@ -99,7 +98,10 @@
           </div>
         </div>
       </div>
+      <!-- partial -->
+      <!-- partial:partials/_sidebar.html -->
       <div id="menu"></div>
+      <!-- partial -->
       <div class="main-panel">
         <div class="content-wrapper">
           <div class="row">
@@ -112,48 +114,37 @@
                     </li>
                   </ul>
                 </div><br>
-                <div class="main-panel">        
-                    <div class="content-wrapper">
-                      <div class="row">
-                        <div class="col-md-12 grid-margin stretch-card">
-                          <div class="card">
-                            <div class="card-body">
-                              <h4 class="card-title">Adicionar Funcionário</h4>
-                              <div id="mensagemServidor"></div>
-                              <form class="forms-sample" id="adicionarFuncionarioForm">
-                                <div class="form-group">
-                                  <input type="hidden" name="idEmpresa" value="1">
-                                  <label for="nome">Nome</label>
-                                  <input type="text" class="form-control" id="nomeFuncionario" name="nomeFuncionario" placeholder="Nome" required>
-                                </div>
-                                <div class="form-group">
-                                  <label for="cargo">Cargo</label>
-                                  <input type="text" class="form-control" id="cargo" name="cargo" placeholder="Cargo" required>
-                                </div>
-                                <div class="form-group">
-                                  <label for="email">E-mail</label>
-                                  <input type="email" class="form-control" id="email" name="email" placeholder="E-mail" required>
-                                </div>
-                                <div class="form-group">
-                                  <label for="senha">Senha</label>
-                                  <input type="password" class="form-control" id="senha" name="senha" placeholder="Senha" required>
-                                </div>
-                                <div class="form-group">
-                                  <label for="confirmarSenha">Confirmar Senha</label>
-                                  <input type="password" class="form-control" id="confirmarSenha" name="confirmarSenha" placeholder="confirmarSenha" required>
-                                  </div>
-                                <button type="submit" class="btn btn-light">Adicionar Funcionário</button>
-                              </form>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                
+            <div class="col-lg-12 grid-margin stretch-card">
+                <div class="card">
+                  <div class="card-body">
+                    <h4 class="card-title">Lista de Funcionários</h4>
+                    <div class="table-responsive">
+                      <table class="table table-striped">
+                        <thead>
+                          <tr>
+                            <th>
+                              Imagem
+                            </th>
+                            <th>
+                              Funcionário
+                            </th>
+                            <th>
+                              Cargo
+                            </th>
+                            <th>
+                              Opções
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody id="tabelaFuncionarios">
+                            
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
-            
-
-
-
-
+                </div>
+              </div>
               </div>
             </div>
           </div>
@@ -212,51 +203,74 @@
             xhr.send();
         }
 
+    function criarTabelaFuncionarios(dados) {
+      var tabela = document.getElementById("tabelaFuncionarios");
+
+      dados.forEach(function (item) {
+        var novaLinha = tabela.insertRow();
+
+        var colunaNome = novaLinha.insertCell(0);
+        colunaNome.innerHTML = '<img src="' + caminho_imagem + item.img_perfil + '">';
+
+        var colunaNomeFuncionario = novaLinha.insertCell(1);
+        colunaNomeFuncionario.innerHTML = '<div class="d-flex"><div><h6>' + item.nomeFuncionario + '</h6></div></div>';
+
+        var colunaCargo = novaLinha.insertCell(2);
+        colunaCargo.innerHTML = '<div class="d-flex"><div><h6>' + item.nomeCargo + '</h6></div></div>';
+
+        var alterarAcesso = novaLinha.insertCell(3);
+        alterarAcesso.innerHTML = '<div class="badge badge-opacity-success"><div><h6>Alterar Acesso</h6></div></div> <div class="badge badge-opacity-warning"><div><h6>Alterar Dados</h6></div></div> <div class="badge badge-danger"><div><h6>Inativar</h6></div></div>';
+
+
+      
+      });
+        }
+    
+    function obterDadosFuncionarios(){
+      apiUrl = "../../backend/admin/listar-funcionarios.php";
+
+      fetch(apiUrl)
+          .then(response => response.json())
+          .then(data => {
+            criarTabelaFuncionarios(data);
+            console.log(data);
+          })
+          .catch(error => { 
+              console.error('Erro na requisição à API:', error);
+          });
+    }
+
     function alterarImagemPerfil(imagem_caminho){
       var imagem = document.getElementById('imagem_perfil');
     }
 
-    $(document).ready(function() {
-        $("#adicionarFuncionarioForm").submit(function(e) {
-            e.preventDefault(); 
+    function criarListaFuncionarios(dados) {
+      var ulElement = $('<ul class="list-unstyled"></ul>');
 
-            $.ajax({
-                type: "POST",
-                url: "../../backend/admin/adicionar-funcionario.php", 
-                data: $(this).serialize() + "&ajax=true", 
-                success: function(response) {
-                    $("#mensagemServidor").html(response);
+      dados.forEach(function (item) {
+          var liElement = $('<li class="dropdown-item preview-item"></li>');
+          var contentElement = $('<div class="preview-item-content flex-grow py-2"></div>');
 
-                    if (response == 'Funcionário adicionado com sucesso.'){
-                        limparCampos();
-                    }
-                    
-                },
-                error: function(error) {
-                    console.log(error);
-                    $("#mensagemServidor").html("Erro ao processar a solicitação.");
-                }
-            });
-        });
-    });
+          var subjectElement = $('<p class="preview-subject ellipsis font-weight-medium text-dark"></p>').text(item.nomeFuncionario); 
 
-    function limparCampos(){
-        document.getElementById("nomeFuncionario").value = "";
-        document.getElementById("cargo").value = "";
-        document.getElementById("email").value = "";
-        document.getElementById("senha").value = "";
-        document.getElementById("confirmarSenha").value = "";
+          contentElement.append(subjectElement);
+          liElement.append(contentElement);
+          ulElement.append(liElement);
+      });
+
+      $('#listaFuncionarios').html(ulElement);
     }
-    
 
     function carregarMenu(){
       $("#menu").load("menu.html");
     }
 
     verificarAutenticacao();
+    obterDadosFuncionarios();
     carregarMenu();
 
   </script>
 </body>
 
 </html>
+

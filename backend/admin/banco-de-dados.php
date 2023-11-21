@@ -184,14 +184,23 @@ function obterReservas ($idCliente, $idFuncionario){
 function obterAtendimentos ($idCliente, $idFuncionario){
     global $conn;
 
-    $sql = "SELECT idAtendimento,
-                   idEmpresa,
-                   idCliente,
-                   idFuncionario,
-                   dataAtendimento,
-                   servico,
-                   valor
+    $sql = "SELECT  atendimento.idAtendimento,
+                    atendimento.idEmpresa,
+                    atendimento.idCliente,
+                    cliente.nomeCliente,
+                    atendimento.idFuncionario,
+                    funcionario.nomeFuncionario,
+                    atendimento.dataAtendimento,
+                    atendimento.servico,
+                    servico.nomeServico,
+                    atendimento.valor
             FROM tb_atendimento atendimento
+            INNER JOIN tb_cliente cliente
+            ON cliente.idCliente = atendimento.idCliente
+            INNER JOIN tb_funcionario funcionario
+            ON atendimento.idFuncionario = funcionario.idFuncionario
+            INNER JOIN tb_servico servico
+            ON atendimento.servico = servico.idServico
             WHERE atendimento.idCliente = IFNULL(".$idCliente.", atendimento.idCliente)
             AND   atendimento.idFuncionario = IFNULL(".$idFuncionario.", atendimento.idFuncionario)";
     
